@@ -1,0 +1,64 @@
+:root {
+--primary-green: #1fbf6b;
+--dark-green: #159e55;
+--bg: #f3fff9;
+--text: #222;
+--card-bg: #fff;
+--radius: 16px;
+--transition: 0.3s;
+}
+
+
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background: var(--bg);
+color: var(--text);
+}
+
+
+header {
+padding: 24px;
+background: var(--primary-green);
+color: white;
+text-align: center;
+font-size: 1.8rem;
+font-weight: bold;
+}
+
+
+.welcome-text {
+padding: 16px;
+font-size: 1.1rem;
+text-align: center;
+}
+
+
+.whatsapp-container {
+text-align: center;
+margin-bottom: 10px;
+}
+
+
+.whatsapp-btn {
+background: var(--primary-green);
+color: white;
+padding: 12px 20px;
+border-radius: 12px;
+text-decoration: none;
+font-weight: bold;
+display: inline-flex;
+align-items: center;
+gap: 10px;
+}
+
+
+.whatsapp-icon {
+width: 22px;
+height: 22px;
+}
+
+
+#categories {
+display: flex;
+}
