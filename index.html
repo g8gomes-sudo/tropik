@@ -1,31 +1,149 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tropik - Cardápio</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tropik - Cardápio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="palm.png">
+
+    <!-- Ícone WhatsApp -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
 </head>
 <body>
-<header>Tropik 🌴 - Cardápio</header>
 
+    <div class="container">
 
-<div class="welcome-text">Bem-vindo ao cardápio online da Tropik! Escolha seu pedido abaixo e peça direto pelo WhatsApp. 😋</div>
+        <header>
+            <h1>
+                <img src="palm.png" class="logo-icon"> Tropik
+            </h1>
 
+            <p class="welcome">
+                Bem-vindo ao cardápio online da Tropik! <br>
+                Escolha seu pedido abaixo e peça direto pelo WhatsApp. 😋
+            </p>
 
-<div class="whatsapp-container">
-<a href="https://wa.me/5561999665480?text=Ol%C3%A1!%20Quero%20fazer%20um%20pedido%20😋"  target="_blank" class="whatsapp-btn">
-<img src="https://cdn.jsdelivr.net/gh/edent/SuperTinyIcons/images/svg/whatsapp.svg" class="whatsapp-icon" />
-Pedir pelo WhatsApp
-</a>
-</div>
+            <a id="whatsapp-button" 
+               href="https://wa.me/5561999665480?text=Olá!%20Gostaria%20de%20fazer%20um%20pedido.%20"
+               target="_blank"
+               class="whatsapp-button">
+                <i class="bi bi-whatsapp"></i> Pedir no WhatsApp
+            </a>
+        </header>
 
+        <!-- Categorias -->
+        <div id="categories" class="categories"></div>
 
-<section id="categories"></section>
-<section id="items"></section>
+        <!-- Itens -->
+        <div id="items" class="items"></div>
 
+        <footer>
+            <p>© 2025 Tropik</p>
+        </footer>
 
-<script src="script.js"></script>
+    </div>
+
+    <script>
+        const sheetUrl =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJDMp2xzr1fdgqsv9pSYNqTu_u15isTu1FEgCHyZ7jMV6cHteoNA00McvUj_LAVRNkBcJ6kXfRt1Qt/pub?output=csv";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch(sheetUrl)
+                .then(r => r.text())
+                .then(parseCSV)
+                .then(menuData => {
+                    window.menuData = menuData;
+                    renderCategories();
+                    renderItems(Object.keys(menuData)[0]);
+                })
+                .catch(err => console.error("Erro ao carregar dados:", err));
+        });
+
+        function parseCSV(csvText) {
+            const lines = csvText.split("\n").map(l => l.trim()).filter(l => l !== "");
+
+            const header = lines[0].split(",").map(h => h.toLowerCase());
+
+            const idxCategoria = header.indexOf("categoria");
+            const idxNome = header.indexOf("nome");
+            const idxPreco = header.indexOf("preço");
+            const idxDescricao = header.indexOf("descrição");
+            const idxImg = header.indexOf("img");
+
+            const menuData = {};
+
+            for (let i = 1; i < lines.length; i++) {
+                const row = lines[i].split(",");
+
+                const categoria = row[idxCategoria]?.trim().toLowerCase();
+                const nome = row[idxNome]?.trim();
+                const preco = row[idxPreco]?.trim();
+                const descricao = row[idxDescricao]?.trim();
+                const img = row[idxImg]?.trim();
+
+                if (!categoria || !nome) continue;
+
+                if (!menuData[categoria]) {
+                    menuData[categoria] = [];
+                }
+
+                menuData[categoria].push({
+                    name: nome,
+                    price: preco,
+                    description: descricao,
+                    img: img
+                });
+            }
+
+            return menuData;
+        }
+
+        function renderCategories() {
+            const container = document.getElementById("categories");
+            container.innerHTML = "";
+
+            Object.keys(menuData).forEach((cat, index) => {
+                const btn = document.createElement("button");
+                btn.classList.add("cat-btn");
+                btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+
+                if (index === 0) btn.classList.add("active");
+
+                btn.onclick = () => selectCategory(cat, btn);
+
+                container.appendChild(btn);
+            });
+        }
+
+        function renderItems(category) {
+            const container = document.getElementById("items");
+            container.innerHTML = "";
+
+            menuData[category].forEach(item => {
+                const card = document.createElement("div");
+                card.classList.add("item-card");
+
+                card.innerHTML = `
+                    <img src="${item.img}" class="item-img" alt="${item.name}">
+                    <h3>${item.name}</h3>
+                    <p class="price">R$ ${item.price}</p>
+                    ${item.description ? `<p class="desc">${item.description}</p>` : ""}
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function selectCategory(cat, btn) {
+            document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderItems(cat);
+        }
+    </script>
+
 </body>
 </html>
+
 
